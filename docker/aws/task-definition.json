@@ -2,7 +2,7 @@
     "family": "devops-taskdefinitions",
     "containerDefinitions": [
         {
-            "image": "980259306743.dkr.ecr.ap-southeast-1.amazonaws.com/%IMAGE%:%VERSION%",
+            "image": "980259306743.dkr.ecr.ap-southeast-1.amazonaws.com/%REPO%",
             "name": "devops-container",
             "essential": true,
             "cpu": 10,
