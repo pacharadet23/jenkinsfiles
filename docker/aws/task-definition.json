@@ -2,7 +2,7 @@
     "family": "devops-taskdefinitions",
     "containerDefinitions": [
         {
-            "image": "980259306743.dkr.ecr.ap-southeast-1.amazonaws.com/nginx:1.1.2",
+            "image": "980259306743.dkr.ecr.ap-southeast-1.amazonaws.com/%IMAGE%:%VERSION%",
             "name": "devops-container",
             "essential": true,
             "cpu": 10,
