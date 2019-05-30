@@ -1,18 +1,7 @@
 ansiColor('xterm') {
 node('master'){
     stage('output'){
-        TEST = sh([
-                colorized: true,
-                returnStdout: true,
-                script: "md5sum /var/lib/rpm/Packages| awk '{print\$1}'"
-            ]).trim()
-    }
-    stage('check'){
-        echo "${TEST}"
-        echo "\033[1;31m[Errorrrrrrrrrr]   \033[0m "
-        if ("${TEST}" == "548725d93e65ef0da5a7bddf78e65c68"){
-            echo "Matched"
-        }
+        def props = readJSON file: '/var/lib/jenkins/test.json'
     }
 }
 }
