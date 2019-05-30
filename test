@@ -9,7 +9,7 @@ node('master'){
     }
     stage('check'){
         echo "${TEST}"
-        echo "\033[1;31m[Error]   \033[0m "
+        echo "\033[1;31m[Errorrrrrrrrrr]   \033[0m "
         if ("${TEST}" == "548725d93e65ef0da5a7bddf78e65c68"){
             echo "Matched"
         }
