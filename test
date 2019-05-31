@@ -1,7 +1,7 @@
 ansiColor('xterm') {
 node('master'){
     stage('output'){
-        def props = readJSON file: '/var/lib/jenkins/test111.json'
+        print("123")
     }
 }
 }
