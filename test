@@ -1,7 +1,0 @@
-ansiColor('xterm') {
-node('master'){
-    stage('output'){
-        print("123")
-    }
-}
-}
