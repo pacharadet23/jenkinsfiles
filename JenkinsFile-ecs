@@ -1,0 +1,54 @@
+ansiColor('xterm') {
+node('master'){
+    env.IMAGE = 'nginx'
+    env.CLUSTER = 'devops-cluster'
+    env.TASKFAMILY = 'devops-taskdefinitions'
+    env.SERVICE = 'devops-nginx'
+    env.FILETASK = "file:///var/lib/jenkins/workspace/ecs/docker/aws/task-definition-${VERSION}.json"
+    env.REPO = "${IMAGE}:${VERSION}"
+    stage('Checkout'){
+        git credentialsId: '460e1b33-02d0-4c17-9706-889af766d60d', url: 'https://github.com/pacharadet23/jenkinsfiles.git',branch:'master'
+    }
+    stage('Docker Push'){
+        sh([
+            script: "sudo docker build -t ${IMAGE}:${VERSION} /var/lib/jenkins/workspace/ecs/docker/.",
+            script: "sudo docker tag ${IMAGE}:${VERSION} 980259306743.dkr.ecr.ap-southeast-1.amazonaws.com/${IMAGE}:${VERSION}",
+            script: "sudo docker push 980259306743.dkr.ecr.ap-southeast-1.amazonaws.com/${IMAGE}:${VERSION}"
+        ])
+    }
+    stage("Check Task") {
+        currverTaskDef = sh([
+            returnStdout: true,
+            script: "sudo aws ecs describe-task-definition --task-definition ${TASKFAMILY} | egrep 'revision' | tr ',' ' ' | awk '{print \$2}'"
+        ]).trim()
+        //currTaskDef = sh([
+        //    returnStdout: true,
+        //    script: "sudo aws ecs list-tasks --cluster ${CLUSTER} --family ${TASKFAMILY} --output text | egrep 'TASKARNS'| awk '{print \$2}'"
+        //]).trim()
+    }
+    stage("Down Service") {
+        sh([
+            script: "sudo aws ecs update-service --cluster ${CLUSTER} --service ${SERVICE} --task-definition ${TASKFAMILY}:${currverTaskDef} --desired-count 0"
+        ])
+    }
+    stage("Register [TaskDefinition]") {
+        sh([
+            script: "sudo sed -e 's;%REPO%;${REPO};g' /var/lib/jenkins/workspace/ecs/docker/aws/task-definition.json > /var/lib/jenkins/workspace/ecs/docker/aws/task-definition-${VERSION}.json"
+        ])
+        sh([
+            script: "sudo aws ecs register-task-definition --family ${TASKFAMILY} --cli-input-json ${FILETASK}"
+        ])
+    }
+    stage("Last Registered [TaskDefinition#revision]") {
+        taskRevision = sh([
+            returnStdout: true,
+            script: "sudo aws ecs describe-task-definition --task-definition ${TASKFAMILY} | egrep 'revision' | tr ',' ' ' | awk '{print \$2}'"
+        ]).trim()
+    }
+    stage("Update Service") {
+        sh([
+            script: "sudo aws ecs update-service --cluster ${CLUSTER} --service ${SERVICE} --task-definition ${TASKFAMILY}:${taskRevision} --desired-count 1"
+        ])
+    }
+}
+}
