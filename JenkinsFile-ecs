@@ -1,5 +1,6 @@
 ansiColor('xterm') {
 node('master'){
+    echo "current build number: ${currentBuild.number}"
     env.IMAGE = 'nginx'
     env.CLUSTER = 'devops-cluster'
     env.TASKFAMILY = 'devops-taskdefinitions'
