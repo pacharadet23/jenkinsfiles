@@ -3,5 +3,14 @@ node('node1'){
     stage('Checkout'){
         git credentialsId: '460e1b33-02d0-4c17-9706-889af766d60d', url: 'https://github.com/pacharadet23/jenkinsfiles.git',branch:'master'
     }
+    stage('test advance script') {
+        echo "current build number: ${currentBuild.number}"
+        echo "previous build number: ${currentBuild.previousBuild.getNumber()}"
+        def causes = currentBuild.rawBuild.getCauses()
+        echo "causes: ${causes}"
+        def rebuildCause0 = currentBuild.rawBuild.getCause(com.sonyericsson.rebuild.RebuildCause)
+        echo "rebuildCause0: ${rebuildCause0}"
+        echo "rebuild up number: ${rebuildCause0.getUpstreamBuild()}"
+    }
 }
 }
