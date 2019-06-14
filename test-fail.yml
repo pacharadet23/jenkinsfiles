@@ -1,9 +1,6 @@
 ---
 - hosts: localhost
   tasks:
-  - name: compare checksum file
-    debug:
-      msg: 
-        - "MD5 in File:"
-    #when: 1 == 1
-    failed_when: 1 != 1
+  - fail:
+    msg: The system may not be provisioned according to the CMDB status.
+  when: "1" != "2"
