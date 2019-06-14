@@ -4,9 +4,11 @@ node('master'){
         git credentialsId: '460e1b33-02d0-4c17-9706-889af766d60d', url: 'https://github.com/pacharadet23/jenkinsfiles.git',branch:'master'
     }
     stage('Flyway'){
-        sh([
-          returnStdout: true,
-          script: "ls /home/"
+        ansiblePlaybook([
+            colorized: true,
+            playbook: './test-fail.yml',
+            inventory: '',
+            extras: '-u root -vv'
        ])
     }
 }
