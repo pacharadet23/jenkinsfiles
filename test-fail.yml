@@ -6,4 +6,5 @@
       register: result
       failed_when:
         - result.rc == 0
+        - '"No such" not in result.stdout'
 
