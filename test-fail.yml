@@ -1,0 +1,11 @@
+---
+- hosts: localhost
+  tasks:
+  - name: compare checksum file
+    debug:
+      msg: 
+        - "MD5 in File:"
+    #when: 1 == 1
+    failed_when: 1 != 1
+    args:
+      warn: false
