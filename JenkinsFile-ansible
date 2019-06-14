@@ -1,0 +1,10 @@
+ansiColor('xterm') {
+node('comarch'){
+    stage('Flyway'){
+        sh([
+          returnStdout: true,
+          script: "ls /home/"
+       ])
+    }
+}
+}
