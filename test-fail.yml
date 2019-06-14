@@ -4,7 +4,5 @@
     - name: test
       command: ls /tmp/this_should_not_be_here
       register: result
-      failed_when:
-        - result.rc == 0
-        - '"No such" not in result.stdout'
+      failed_when: '"No such" in result.stderr'
 
