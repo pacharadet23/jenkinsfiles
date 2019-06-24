@@ -1,0 +1,50 @@
+node ('master') {
+
+    stage('cleanup workspace master')
+    step([$class: 'WsCleanup'])
+
+
+    stage('jenkins master checkout')
+    checkout([$class: 'GitSCM', branches: [[name: '*/master']], doGenerateSubmoduleConfigurations: false, extensions: [], submoduleCfg: [], userRemoteConfigs: [[credentialsId: 'automate-jenkins-gitlab', url: 'http://gitlab.easy2easiest.com/gitlab/scb-devops/jenkinsfile-generator.git']]])
+
+
+    stage('uploads file xlsx to master')
+    def file = input message: 'Please upload layout in excelfile ', parameters: [file(description: '', name: 'pc.xlsx')]
+    sh 'cp ../builds/$BUILD_NUMBER/pc.xlsx ${WORKSPACE}/pc.xlsx'
+    
+
+    stage('check environment')
+    echo "check env"
+    sh 'python3 -V'
+    sh 'ls $WORKSPACE'
+
+    stage('push xlsx show up')
+    step([$class: 'ArtifactArchiver', artifacts: 'pc.xlsx', fingerprint: true])
+    archiveArtifacts artifacts: 'pc.xlsx'
+
+    stage('sent file to jenkins slave')
+    stash name: "pc.xlsx", includes: "pc.xlsx"
+
+}
+
+
+node ('remote-docker-ssh') {
+
+    
+    stage('cleanup workspace jenkin slave')
+    step([$class: 'WsCleanup'])
+    
+    stage('checkout to jenkins slave')
+    checkout([$class: 'GitSCM', branches: [[name: '*/master']], doGenerateSubmoduleConfigurations: false, extensions: [], submoduleCfg: [], userRemoteConfigs: [[credentialsId: 'automate-jenkins-gitlab', url: 'http://gitlab.easy2easiest.com/gitlab/scb-devops/jenkinsfile-generator.git']]])
+
+    stage('check environment')
+    unstash "pc.xlsx"
+    sh 'ls -la'
+
+    stage('run python script to auto tagging')
+    withCredentials([[$class: 'UsernamePasswordMultiBinding', credentialsId: 'automate-jenkins-gitlab', passwordVariable: 'PASSWORD', usernameVariable: 'USERNAME']]) {
+        sh 'python3 generate_config_job_nonpord.py $USERNAME $PASSWORD pc'
+    }
+
+}
+
